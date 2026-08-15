@@ -10,7 +10,7 @@ Auto relogs in when faced with Server or Runtime Error. A notification sound wil
 
 1. **Clone or Download this repository:**
    ```bash
-   git clone [https://github.com/YOUR_USERNAME/your-repo-name.git](https://github.com/YOUR_USERNAME/your-repo-name.git)
+   git clone https://github.com/manhalhads/RegAlert
    cd RegAlert
 
 2. **Install the required dependencies:**
@@ -21,18 +21,19 @@ Auto relogs in when faced with Server or Runtime Error. A notification sound wil
 3. **Configure your credentials:**
    * Create a file named `.env` in the root folder.
    * Add your credentials inside it like this:
-     ```env
-     USERNAME=YourRollNumber #22L8976
-     PASSWORD=YourPassword #012356789
-     ```
+     ```bash
+     USERNAME=YourRollNumber # e.g.22L8976
+     PASSWORD=YourPassword # e.g 012356789
+     
 
 **Usage**
 
 Run the script via your terminal:
-```
+```bash
 python main.py
 ```
 
-**Potential issues:**
+
+**Potential issues:**<br>
 Recaptcha v3 may not be bypassed in every scenario.
 This script relies on Flex's UI and code of August 2026. It may fail for future versions.
