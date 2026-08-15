@@ -15,7 +15,7 @@ Auto relogs in when faced with Server or Runtime Error. A notification sound wil
 
 2. **Install the required dependencies:**
     ```bash
-    pip install playwright playwright-stealth playwright-recaptcha python-dotenv playsound3
+    pip install -r requirements.txt
     playwright install chromium
 
 3. **Configure your credentials:**
