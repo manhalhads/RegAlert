@@ -77,7 +77,7 @@ USER_DATA_DIR = os.path.join(os.getcwd(), "flex_session_data")
 
 with sync_playwright() as playwright:
 # Launch Browser
-# LAUNCH persisten context (Saves cookies and profile across restarts)
+# Launch persistent context (Saves cookies and profile across restarts)
     context = playwright.chromium.launch_persistent_context(
     user_data_dir=USER_DATA_DIR,
     headless=False,
@@ -140,9 +140,8 @@ with sync_playwright() as playwright:
                             play_button.click()
                             print("Audio challenge play button clicked automatically!")
                     except Exception as e:
-                        print("ℹAudio challenge wasn't triggered or play button was already handled.")
-                # -----------------------------------------------
-
+                        print("Audio challenge wasn't triggered or play button was already handled.")
+               
                 page.wait_for_timeout(500)
 
                 #click sign in
@@ -192,13 +191,14 @@ with sync_playwright() as playwright:
                 if "Login" in page.url:
                     print("Session expired / logged out. Restarting whole process from Login...")
                     break
-                #wait 3 secs before checking for registration banner
+                # wait 3 secs before checking for registration not active yet banner
                 registration_banner = page.get_by_text("Registration not active yet.")
-                # if registration_banner.is_visible(timeout=3000):
-                #     print("Registration not active banner detected!")
-                # else:
-                #     print("Registration might be active! Banner not found.")
-                #     break
+                if registration_banner.is_visible(timeout=3000):
+                    print("Registration not active banner detected!")
+                else:
+                    print("Registration might be active! Banner not found.")
+                    registration_opened = True
+                    break
 
                 # Check for Register button (case-insensitive or partial)
                 register_button = page.locator("button:has-text('Register Courses'), input[value*='Register']")
@@ -213,7 +213,7 @@ with sync_playwright() as playwright:
                 print(f"Waiting {REFRESH_FREQUENCY_SECONDS} seconds before refreshing...")
                 page.wait_for_timeout(REFRESH_FREQUENCY_SECONDS * 1000)
 
-                #  Now refresh the page to get the latest state
+                #  Refresh the page to get the latest state
                 print("Refreshing Course Registration page...")
                 page.goto("https://flexstudent.nu.edu.pk/CourseRegistration", wait_until="commit", timeout=0)
                 
