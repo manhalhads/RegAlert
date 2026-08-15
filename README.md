@@ -10,13 +10,14 @@
 1. **Clone or Download this repository:**
    ```bash
    git clone [https://github.com/YOUR_USERNAME/your-repo-name.git](https://github.com/YOUR_USERNAME/your-repo-name.git)
-   cd your-repo-name
+   cd RegAlert
 
-2. Install the required dependencies:
+2. **Install the required dependencies:**
+    ```bash
     pip install playwright playwright-stealth playwright-recaptcha python-dotenv playsound3
     playwright install chromium
 
-3. Configure your credentials:
+3. **Configure your credentials:**
 
     Create a file named .env in the root folder.
 

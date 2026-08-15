@@ -1,0 +1,5 @@
+playwright>=1.44
+playwright-stealth
+playwright-recaptcha
+python-dotenv
+playsound3
