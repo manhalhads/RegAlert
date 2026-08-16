@@ -51,4 +51,4 @@ If you encounter unexpected behavior or errors while using RegAlert, check the c
 
 
 **Notes** <br>
-The file has comments so you may customize the script according to your requirement (Change the refresh frequency, look for a specific text on the registration page or a button.) For details on how to do the former and more using playwright, check out playwright's documentation on https://playwright.dev/python/docs/api/class-playwright and for any questions, contact at https://fajar-shakeel.vercel.app/
+The file has comments so you may customize the script according to your requirement (Change the refresh frequency, look for a specific text on the registration page or a button.) For details on how to do the former and more using playwright, check out playwright's documentation on https://playwright.dev/python/docs/api/class-playwright and for any questions, contact at https://fajar-shakeel.vercel.app/#contact
