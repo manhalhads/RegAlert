@@ -17,13 +17,10 @@ REFRESH_FREQUENCY_SECONDS = 300
 
 
 def sound_alert():
-    print("\n" + "="*50)
-    print("🚨 REGISTRATION EVENT DETECTED! 🚨")
-    print("="*50 + "\n")
+    print("Registration may have started!")
 
     try:
-        # Plays your custom audio file smoothly and cleanly across Windows, Mac, and Linux
-        # (Make sure 'alert.mp3' or 'chime.wav' is in your script folder)
+        # Plays custom audio file (You can change this by replacing "alert.mp3" with your own audio file path)
         playsound("alert.mp3", block=False)
         
     except Exception as e:
@@ -36,8 +33,7 @@ def sound_alert():
             print("\a", end="")
             
     sys.stdout.flush()
-def is_error(page):
-    #checks for ASP.NET Runtime Error headings or crash elements
+def is_error(page): #Checks for ASP.NET Runtime Error headings or crash elements
     try:
         # Check if the red ASP.NET "Server Error" title exists on screen
         server_error_heading = page.locator("h1:has-text('Server Error in'), h1:has-text('Runtime Error')")
@@ -52,7 +48,7 @@ def is_error(page):
     except Exception:
         return False
 
-def is_captcha_expired(page):
+def is_captcha_expired(page): #Checks if captcha is expired or not solved
     try:
         captcha_frame = page.frame_locator("iframe[title='reCAPTCHA']")
         checkbox = captcha_frame.locator(".recaptcha-checkbox")
@@ -71,26 +67,23 @@ def is_captcha_expired(page):
     except Exception:
         return False
 
-# Specify a local directory to store browser profile, cookies, and cache
+# A local directory to store browser profile, cookies, and cache - this allows the session to persist across restarts of the script so recaptcha doesn't need to be solved every time. Make sure this directory is secure and not publicly accessible.
 USER_DATA_DIR = os.path.join(os.getcwd(), "flex_session_data")
 
 
 with sync_playwright() as playwright:
-# Launch Browser
-# Launch persistent context (Saves cookies and profile across restarts)
+# Launch browser with persistent context (Saves cookies and profile across restarts)
     context = playwright.chromium.launch_persistent_context(
     user_data_dir=USER_DATA_DIR,
     headless=False,
-    args=["--disable-blink-features=AutomationControlled"]
+    args=["--disable-blink-features=AutomationControlled"] #This argument helps to prevent detection of automation by some websites
     )
-    #args makes it harer for websites to detect automation
-
-
+    
     # Grab the default page created by persistent context
     page = context.pages[0] if context.pages else context.new_page()
 
     # Apply stealth anti-bot evasion
-    Stealth().apply_stealth_sync(page) #modifies the browser’s internal JavaScript properties in real time to hide the fact that Playwright is controlling the browser.
+    Stealth().apply_stealth_sync(page) # modifies the browser’s internal JavaScript properties in real time to hide the fact that Playwright is controlling the browser.
 
     while True:
         registration_opened = False
@@ -108,7 +101,7 @@ with sync_playwright() as playwright:
                 # Roll Number input field
                 roll_input.click()
                 roll_input.press("Control+A")
-                roll_input.press("Backspace")
+                roll_input.press("Backspace") #Erase any pre-filled text in the input field
                 roll_input.type(USERNAME, delay=100)
 
                 page.wait_for_timeout(300)
@@ -117,16 +110,16 @@ with sync_playwright() as playwright:
                 pass_input = page.get_by_placeholder("Password")
                 pass_input.click()
                 pass_input.press("Control+A")
-                pass_input.press("Backspace")
+                pass_input.press("Backspace") #Erase any pre-filled text in the input field
                 pass_input.type(PASSWORD, delay=100)
 
 
-                # Check i am not a robot
+                # Check I am not a robot
                 # Use playwright-recaptcha solver context manager
                 with recaptchav2.SyncSolver(page) as solver:
-                    solver.solve_recaptcha()
+                    solver.solve_recaptcha() #This version of the solver will automatically detect and solve the reCAPTCHA v2 challenge if it appears on the page. It will also handle any audio challenges that may be triggered.
                     
-                    # --- AUTOMATE THE AUDIO CHALLENGE PLAY BUTTON ---
+                    # If the audio challenge is triggered, attempt to click the play button automatically
                     try:
                         # Give the audio frame a second to load
                         page.wait_for_timeout(1000)
@@ -141,20 +134,23 @@ with sync_playwright() as playwright:
                             print("Audio challenge play button clicked automatically!")
                     except Exception as e:
                         print("Audio challenge wasn't triggered or play button was already handled.")
-               
+                
+
                 page.wait_for_timeout(500)
 
-                #click sign in
+                # click sign in
                 page.get_by_role("button").click()
                 print("Logging in...")
 
                 page.wait_for_load_state("domcontentloaded", timeout=0)
-                
+
+                # Check if captcha expired or not solved
                 if is_captcha_expired(page):
                     print("⚠️ reCAPTCHA expired during sign in. Restarting whole process...")
                     time.sleep(2)
                     continue
 
+                # Check if server/runtime error occurred during login
                 if is_error(page):
                     print("Runtime error on login post. Restarting whole process...")
                     time.sleep(2)
@@ -166,11 +162,12 @@ with sync_playwright() as playwright:
                 continue
 
 
-            #click course registration
+            # Click course registration
             page.get_by_text("Course Registration").click(no_wait_after=True)
             page.wait_for_load_state("domcontentloaded", timeout=0) 
             print("Navigating to Course Registration page...")
 
+            #Check if server/runtime error occurred during course registration navigation
             if is_error(page):
                 print("⚠️ Runtime error on course registration. Restarting whole process...")
                 time.sleep(2)
@@ -191,8 +188,9 @@ with sync_playwright() as playwright:
                 if "Login" in page.url:
                     print("Session expired / logged out. Restarting whole process from Login...")
                     break
-                # wait 3 secs before checking for registration not active yet banner
-                registration_banner = page.get_by_text("Registration not active yet.")
+
+                # Wait 3 secs before checking for registration banner (You can change time if you want to check faster or slower)
+                registration_banner = page.get_by_text("Registration not active yet.") # You can change this text to match the exact banner text on the page if it changes in the future.
                 if registration_banner.is_visible(timeout=3000):
                     print("Registration not active banner detected!")
                 else:
@@ -201,19 +199,21 @@ with sync_playwright() as playwright:
                     break
 
                 # Check for Register button (case-insensitive or partial)
+                # You may comment this area if you want to rely solely on the banner check above, but this is an additional check to ensure registration is open.
+                #-----------------------------------------------------------------------------
                 register_button = page.locator("button:has-text('Register Courses'), input[value*='Register']")
-
-                #register_button = page.get_by_role("button", name="Register", exact=False)
                 if not register_button.is_visible():
                     print("Register button not found, refreshing the page...")
-                else: #Registration button is visible
+                else: # Registration button is visible
                     registration_opened = True
                     break
+                #-------------------------------------------------------------------------------
 
+                # Wait for a specified time before refreshing the page to check again (In the default case, 5 minutes - you may change this value in the REFRESH_FREQUENCY_SECONDS variable at the top of the script)
                 print(f"Waiting {REFRESH_FREQUENCY_SECONDS} seconds before refreshing...")
                 page.wait_for_timeout(REFRESH_FREQUENCY_SECONDS * 1000)
 
-                #  Refresh the page to get the latest state
+                #  Now refresh the page to get the latest state
                 print("Refreshing Course Registration page...")
                 page.goto("https://flexstudent.nu.edu.pk/CourseRegistration", wait_until="commit", timeout=0)
                 
@@ -225,5 +225,5 @@ with sync_playwright() as playwright:
             time.sleep(2)
 
     while(True):
-        sound_alert()
+        sound_alert() # Play sound alert until forcefully stopped
         time.sleep(1)
