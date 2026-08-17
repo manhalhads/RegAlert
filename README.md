@@ -22,7 +22,7 @@ Auto relogs in when faced with Server or Runtime Error. A notification sound wil
    * Create a file named `.env` in the root folder.
    * Add your credentials inside it like this:
      ```bash
-     USERNAME=YourRollNumber # e.g.22L8976
+     ROLL_NUMBER=YourRollNumber # e.g.22L8976
      PASSWORD=YourPassword # e.g 012356789
      
 
