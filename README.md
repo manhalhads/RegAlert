@@ -1,5 +1,5 @@
 # RegAlert
-A notification script designed to monitor and log into the FAST-NUCES FLEX student portal, handle reCAPTCHA bypass, and alert you instantly when course registration opens.
+A notification script designed to monitor and log into the FAST-NUCES Flex student portal, handle reCAPTCHA bypass, and alert you instantly when course registration opens.
 Auto relogs in when faced with Server or Runtime Error. A notification sound will continue playing when Registration opens until the script execution is forcefully stopped.
 
 
